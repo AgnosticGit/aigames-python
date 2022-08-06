@@ -8,4 +8,4 @@ def load_perceptron(request):
     perceptrons = Perceptron.objects.all()
     serialized = PerceptronSerializer(perceptrons, many=True)
 
-    return JsonResponse(serialized.data, content_type="application/json", safe=False)
+    return JsonResponse(serialized.data, safe=False)

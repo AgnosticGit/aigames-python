@@ -17,8 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.static import serve
 
+from aigames.views.session_view import init_session
+
 urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
     path('admin/', admin.site.urls),
+    path('session/', init_session),
     path('perceptron/', include('perceptron.urls')),
 ]
