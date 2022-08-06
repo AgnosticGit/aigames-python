@@ -20,5 +20,5 @@ from django.views.static import serve
 urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
     path('admin/', admin.site.urls),
-    path('', include('perceptron.urls')),
+    path('perceptron/', include('perceptron.urls')),
 ]
