@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'debug_toolbar',
     'perceptron',
+    'users'
 ]
 
 MIDDLEWARE = [
