@@ -1,4 +1,5 @@
 from django.db import models
+from django import forms
 
 
 class Perceptron(models.Model):
@@ -9,4 +10,6 @@ class Perceptron(models.Model):
     input2 = models.IntegerField(null=True)
 
     epoches = models.IntegerField(default=1)
-    learning_rate = models.IntegerField(default=0.1)
+    learning_rate = models.FloatField(default=0.1)
+
+    output = models.IntegerField(null=True)
