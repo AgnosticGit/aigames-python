@@ -50,7 +50,86 @@ def create_perceptron():
 @csrf_exempt
 @api_view(['POST'])
 def try_perceptron(request):
-    perceptron = PerceptronSerializer(data=request.data)
-    ArtificialPerceptron(epoches=1, learning_rate=0.1,
-                         inputs=np.array([0, 0]), targets=np.array([0, 0, 1]))
-    return JsonResponse({})
+    ip = request.META.get("REMOTE_ADDR")
+    user = User.objects.filter(ip=ip).first()
+    perceptron_id = user.perceptron_id
+    perceptron_data = request.data
+
+    perceptron = Perceptron.objects.get(pk=perceptron_id)
+
+    perceptron.input1 = perceptron_data['input1']
+    perceptron.input2 = perceptron_data['input2']
+    perceptron.save()
+
+    serialized = PerceptronSerializer(perceptron)
+    data = serialized.data
+
+    aPerceptron = ArtificialPerceptron(weights=np.array([data['w0'], data['w1']]),
+                                       epoches=data['epoches'],
+                                       learning_rate=0.1,
+                                       inputs=np.array(
+                                           [data['input1'], data['input2']]),
+                                       targets=np.array([0, 0, 1]))
+    data['output'] = aPerceptron.request()
+
+    return JsonResponse({'data': data})
+
+
+@csrf_exempt
+@api_view(['POST'])
+def train_perceptron(request):
+    ip = request.META.get("REMOTE_ADDR")
+    user = User.objects.filter(ip=ip).first()
+    perceptron_id = user.perceptron_id
+    perceptron_data = request.data
+
+    perceptron = Perceptron.objects.get(pk=perceptron_id)
+
+    serialized = PerceptronSerializer(perceptron)
+    data = serialized.data
+
+    aPerceptron = ArtificialPerceptron(weights=np.array([data['w0'], data['w1']]),
+                                       epoches=data['epoches'],
+                                       learning_rate=data['learning_rate'],
+                                       inputs=np.array(
+                                           [data['input1'], data['input2']]),
+                                       targets=np.array([0, 1, 1]))
+    aPerceptron.train(inputs=np.array([
+        [0, 0],
+        [1, 0],
+        [1, 1]]))
+
+    perceptron.input1 = perceptron_data['input1']
+    perceptron.input2 = perceptron_data['input2']
+    perceptron.learning_rate = perceptron_data['learning_rate']
+    perceptron.epoches = perceptron_data['epoches']
+    perceptron.w0 = round(aPerceptron.weights[0], 2)
+    perceptron.w1 = round(aPerceptron.weights[1], 2)
+    perceptron.save()
+
+    return JsonResponse({'data': data})
+
+
+@csrf_exempt
+@api_view(['POST'])
+def reset_perceptron(request):
+    ip = request.META.get("REMOTE_ADDR")
+    user = User.objects.filter(ip=ip).first()
+    perceptron_id = user.perceptron_id
+    perceptron = Perceptron.objects.get(pk=perceptron_id)
+
+    initial_perceptron = Perceptron()
+
+    perceptron.input1 = initial_perceptron.input1
+    perceptron.input2 = initial_perceptron.input2
+    perceptron.epoches = initial_perceptron.epoches
+    perceptron.learning_rate = initial_perceptron.learning_rate
+    perceptron.w0 = initial_perceptron.w0
+    perceptron.w1 = initial_perceptron.w1
+    perceptron.output = initial_perceptron.output
+    perceptron.save()
+
+    serialized = PerceptronSerializer(perceptron)
+    data = serialized.data
+
+    return JsonResponse({'data': data})

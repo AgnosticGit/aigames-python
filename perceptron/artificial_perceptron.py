@@ -1,7 +1,8 @@
 import numpy as np
 
+
 class ArtificialPerceptron:
-    def __init__(self, learning_rate: float, epoches: float, inputs: list, targets: list, threshold: float = 0.5, weights: list = np.array([0.0, 0.0])):
+    def __init__(self, learning_rate: float, epoches: float, inputs, targets: list, threshold: float = 0.5, weights: list = np.array([0.1, 0.2])):
         self.learning_rate = learning_rate
         self.epoches = epoches
         self.threshold = threshold
@@ -9,23 +10,30 @@ class ArtificialPerceptron:
         self.targets = targets
         self.weights = weights
 
-    def activation(sum, threshold):
+    def activation(self, sum, threshold):
         if sum <= threshold:
             return 0
         return 1
 
-    def request(self, inputs):
-        x0 = inputs[0]
-        x1 = inputs[1]
+    def request(self, inputs=None):
+        x0 = 0
+        x1 = 0
+
+        if(inputs is None):
+            x0 = self.inputs[0]
+            x1 = self.inputs[1]
+        else:
+            x0 = inputs[0]
+            x1 = inputs[1]
 
         sum = x0 * self.weights[0] + x1 * self.weights[1]
 
         return self.activation(sum, self.threshold)
 
-    def train(self):
+    def train(self, inputs):
         for j in range(0, self.epoches):
-            for i in range(0, self.inputs.shape[0]):
-                result = self.request(self.inputs[i])
+            for i in range(0, inputs.shape[0]):
+                result = self.request(inputs[i])
 
                 delta = self.targets[i] - result
 
