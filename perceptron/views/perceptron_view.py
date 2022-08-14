@@ -83,22 +83,19 @@ def train_perceptron(request):
     perceptron_id = user.perceptron_id
     perceptron_data = request.data
 
-    perceptron = Perceptron.objects.get(pk=perceptron_id)
-
-    serialized = PerceptronSerializer(perceptron)
-    data = serialized.data
-
-    aPerceptron = ArtificialPerceptron(weights=np.array([data['w0'], data['w1']]),
-                                       epoches=data['epoches'],
-                                       learning_rate=data['learning_rate'],
+    aPerceptron = ArtificialPerceptron(weights=np.array([perceptron_data['w0'], perceptron_data['w1']]),
+                                       epoches=perceptron_data['epoches'],
+                                       learning_rate=perceptron_data['learning_rate'],
                                        inputs=np.array(
-                                           [data['input1'], data['input2']]),
-                                       targets=np.array([0, 1, 1]))
+                                           [perceptron_data['input1'], perceptron_data['input2']]),
+                                       targets=np.array([0, 1, 1, 1]))
     aPerceptron.train(inputs=np.array([
         [0, 0],
         [1, 0],
-        [1, 1]]))
+        [1, 1],
+        [0, 1]]))
 
+    perceptron = Perceptron.objects.get(pk=perceptron_id)
     perceptron.input1 = perceptron_data['input1']
     perceptron.input2 = perceptron_data['input2']
     perceptron.learning_rate = perceptron_data['learning_rate']
@@ -107,7 +104,9 @@ def train_perceptron(request):
     perceptron.w1 = round(aPerceptron.weights[1], 2)
     perceptron.save()
 
-    return JsonResponse({'data': data})
+    serialized = PerceptronSerializer(perceptron)
+
+    return JsonResponse({'data': serialized.data})
 
 
 @csrf_exempt
