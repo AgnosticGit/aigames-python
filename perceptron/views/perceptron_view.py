@@ -1,3 +1,4 @@
+import numpy as np
 from perceptron.artificial_perceptron import ArtificialPerceptron
 from perceptron.models import Perceptron
 from perceptron.serializers import PerceptronSerializer
@@ -5,21 +6,15 @@ from django.http import JsonResponse
 from users.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-import numpy as np
 
 
 def load_perceptron(request):
     ip = request.META.get("REMOTE_ADDR")
     user = User.objects.filter(ip=ip).first()
 
-    if user is None:
-        create_user(ip)
-
-    user = User.objects.filter(ip=ip).first()
-
     perceptron_id = user.perceptron_id
 
-    if perceptron_id == None:
+    if perceptron_id is None:
         new_perceptron = create_perceptron()
         user.perceptron_id = new_perceptron.id
         user.save()
@@ -32,12 +27,6 @@ def load_perceptron(request):
     old_serialized = PerceptronSerializer(old_perceptron)
 
     return JsonResponse({'data': old_serialized.data}, safe=False)
-
-
-def create_user(ip):
-    new_user = User()
-    new_user.ip = ip
-    new_user.save()
 
 
 def create_perceptron():
@@ -64,13 +53,13 @@ def try_perceptron(request):
     serialized = PerceptronSerializer(perceptron)
     data = serialized.data
 
-    aPerceptron = ArtificialPerceptron(weights=np.array([data['w0'], data['w1']]),
-                                       epoches=data['epoches'],
-                                       learning_rate=0.1,
-                                       inputs=np.array(
-                                           [data['input1'], data['input2']]),
-                                       targets=np.array([0, 0, 1]))
-    data['output'] = aPerceptron.request()
+    artificial_perceptron = ArtificialPerceptron(weights=np.array([data['w0'], data['w1']]),
+                                                 epoches=data['epoches'],
+                                                 learning_rate=0.1,
+                                                 inputs=np.array(
+                                                     [data['input1'], data['input2']]),
+                                                 targets=np.array([0, 0, 1]))
+    data['output'] = artificial_perceptron.request()
 
     return JsonResponse({'data': data})
 
@@ -83,13 +72,13 @@ def train_perceptron(request):
     perceptron_id = user.perceptron_id
     perceptron_data = request.data
 
-    aPerceptron = ArtificialPerceptron(weights=np.array([perceptron_data['w0'], perceptron_data['w1']]),
-                                       epoches=perceptron_data['epoches'],
-                                       learning_rate=perceptron_data['learning_rate'],
-                                       inputs=np.array(
-                                           [perceptron_data['input1'], perceptron_data['input2']]),
-                                       targets=np.array([0, 1, 1, 1]))
-    aPerceptron.train(inputs=np.array([
+    artificial_perceptron = ArtificialPerceptron(weights=np.array([perceptron_data['w0'], perceptron_data['w1']]),
+                                                 epoches=perceptron_data['epoches'],
+                                                 learning_rate=perceptron_data['learning_rate'],
+                                                 inputs=np.array(
+                                                     [perceptron_data['input1'], perceptron_data['input2']]),
+                                                 targets=np.array([0, 1, 1, 1]))
+    artificial_perceptron.train(inputs=np.array([
         [0, 0],
         [1, 0],
         [1, 1],
@@ -100,8 +89,8 @@ def train_perceptron(request):
     perceptron.input2 = perceptron_data['input2']
     perceptron.learning_rate = perceptron_data['learning_rate']
     perceptron.epoches = perceptron_data['epoches']
-    perceptron.w0 = round(aPerceptron.weights[0], 2)
-    perceptron.w1 = round(aPerceptron.weights[1], 2)
+    perceptron.w0 = round(artificial_perceptron.weights[0], 2)
+    perceptron.w1 = round(artificial_perceptron.weights[1], 2)
     perceptron.save()
 
     serialized = PerceptronSerializer(perceptron)

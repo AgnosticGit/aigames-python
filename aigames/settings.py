@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'debug_toolbar',
     'perceptron',
-    'users'
+    'users',
+    'gradient_descent'
 ]
 
 MIDDLEWARE = [
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'aigames.middlewares.new_user_middleware.NewUserMiddleware'
 ]
 
 INTERNAL_IPS = [

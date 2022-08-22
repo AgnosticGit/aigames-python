@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from perceptron.models import Perceptron
 
+
 class PerceptronSerializer(serializers.ModelSerializer):
     class Meta:
         model = Perceptron
