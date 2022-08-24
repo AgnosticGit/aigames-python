@@ -7,4 +7,4 @@ from perceptron.models import Perceptron
 class GradientDescent2DSerializer(serializers.ModelSerializer):
     class Meta:
         model = GradientDescent2D
-        fields = ['initial_point_x', 'points', 'math_expression', 'delta']
+        fields = ['point_x','point_y', 'points', 'math_expression', 'delta']
