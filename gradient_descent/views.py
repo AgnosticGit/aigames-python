@@ -1,7 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from gradient_descent.models import GradientDescent2D
-from gradient_descent.numeric_string_parser import NumericStringParser
 from users.models import User
 from django.http import JsonResponse
 from gradient_descent.serializers import GradientDescent2DSerializer
@@ -69,15 +68,25 @@ def set_point_x(request):
 
 
 @csrf_exempt
+@api_view(['POST'])
+def set_delta(request):
+    user = User.get_request_user(request)
+    gradient_descent = load_gradient_descent(user)
+    gradient_descent.delta = request.data['delta']
+    gradient_descent.save()
+
+    serialized_gradient_descent = GradientDescent2DSerializer(gradient_descent)
+    return JsonResponse({'data': serialized_gradient_descent.data}, safe=False)
+
+
+@csrf_exempt
 @api_view(['GET'])
 def descent(request):
     user = User.get_request_user(request)
 
     gradient_descent = load_gradient_descent(user)
-    gradient = gradient_descent.point_y / gradient_descent.point_x
-    gradient_descent.point_x = gradient_descent.point_x - gradient_descent.delta * gradient
+    gradient_descent.point_x = gradient_descent.point_x - gradient_descent.delta * gradient_descent.get_gradient()
     gradient_descent.fill_point_y_by_expression()
-
     gradient_descent.save()
 
     serialized_gradient_descent = GradientDescent2DSerializer(gradient_descent)
